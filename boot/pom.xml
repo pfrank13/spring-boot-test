@@ -20,12 +20,23 @@
 	<dependencies>
 		<!-- Start Compile Dependencies -->
 		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>spring-boot-persistence</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<!-- End Compile Dependencies -->
 
 		<!-- Start Test Dependencies -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>spring-boot-test-resources</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

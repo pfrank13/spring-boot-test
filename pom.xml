@@ -27,18 +27,20 @@
   <modules>
     <module>test-resources</module>
     <module>domain</module>
-    <module>client</module>
-    <module>persistence</module>
+    <module>price-client</module>
+    <module>persistence-client</module>
     <module>service</module>
     <module>boot</module>
   </modules>
   <dependencyManagement>
     <dependencies>
+      <!-- START Compile Dependencies -->
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
       </dependency>
+      <!-- END Compile Dependencies -->
     </dependencies>
   </dependencyManagement>
 </project>
