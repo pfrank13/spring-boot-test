@@ -26,7 +26,6 @@
   </properties>
   <modules>
     <module>test-resources</module>
-    <module>domain</module>
     <module>price-client</module>
     <module>persistence-client</module>
     <module>service</module>

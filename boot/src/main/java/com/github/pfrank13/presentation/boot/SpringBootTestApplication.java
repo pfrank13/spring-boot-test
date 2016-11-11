@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {"com.github.pfrank13.presentation.boot.conf"})
 public class SpringBootTestApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SpringBootTestApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(SpringBootTestApplication.class, args);
+  }
 }
