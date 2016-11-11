@@ -1,10 +1,5 @@
 package com.github.pfrank13.presentation.boot.client;
 
-import com.github.pfrank13.presentation.boot.client.impl.PersistenceDbClientImpl;
-import com.github.pfrank13.presentation.boot.conf.EmbeddedDataSourceConfig;
-import com.github.pfrank13.presentation.boot.conf.PersistenceDbClientConfig;
-import com.github.pfrank13.presentation.boot.conf.PropertiesConfig;
-import com.github.pfrank13.presentation.boot.conf.RepositoryConfig;
 import com.github.pfrank13.presentation.boot.model.AbstractEntity;
 import com.github.pfrank13.presentation.boot.model.Category;
 
