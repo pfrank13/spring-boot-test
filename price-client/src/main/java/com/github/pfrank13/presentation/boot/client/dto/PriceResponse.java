@@ -1,13 +1,13 @@
 package com.github.pfrank13.presentation.boot.client.dto;
 
-import java.math.BigDecimal;
+import javax.money.MonetaryAmount;
 
 /**
  * @author pfrank
  */
 public class PriceResponse {
   private String itemId;
-  private BigDecimal price;
+  private MonetaryAmount price;
 
   public String getItemId() {
     return itemId;
@@ -17,11 +17,11 @@ public class PriceResponse {
     this.itemId = itemId;
   }
 
-  public BigDecimal getPrice() {
-    return price;
+  public void setPrice(MonetaryAmount price) {
+    this.price = price;
   }
 
-  public void setPrice(final BigDecimal price) {
-    this.price = price;
+  public MonetaryAmount getPrice() {
+    return price;
   }
 }

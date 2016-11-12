@@ -11,7 +11,8 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
  */
 @Configuration
 @PropertySources({
-    @PropertySource("classpath:/persistence.properties")
+    @PropertySource("classpath:/persistence.properties"),
+    @PropertySource("classpath:/price-client.properties")
 })
 public class PropertiesConfig {
   @Bean

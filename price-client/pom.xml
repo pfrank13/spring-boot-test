@@ -21,14 +21,28 @@
   <dependencies>
     <!-- Start Compile Dependencies -->
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.zalando</groupId>
+      <artifactId>jackson-datatype-money</artifactId>
     </dependency>
     <!-- End Compile Dependencies -->
     <!-- Start Test Dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>spring-boot-test-resources</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- End Test Dependencies -->

@@ -1,0 +1,7 @@
+{
+  "itemId": 1,
+  "price": {
+    "amount": 12.34,
+    "currency": "USD"
+  }
+}
