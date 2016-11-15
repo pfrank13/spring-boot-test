@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.zalando.jackson.datatype.money.DefaultMonetaryAmountFormatFactory;
 import org.zalando.jackson.datatype.money.MoneyModule;
 
 import java.net.URI;
@@ -33,11 +32,10 @@ public class RestOperationsPriceClient implements PriceClient{
     Assert.hasText(baseUrl, "String baseUrl cannot be empty.");
     baseUri = UriComponentsBuilder.fromUriString(baseUrl).build().toUri();
     final ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
-                                                                 .modules(new MoneyModule().withFormatFactory(new DefaultMonetaryAmountFormatFactory()))
+                                                                 .modules(new MoneyModule())
                                                                  .build();
     final MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter(objectMapper);
-    restTemplateBuilder.messageConverters(mappingJackson2HttpMessageConverter);
-    this.restOperations = restTemplateBuilder.build();
+    this.restOperations = restTemplateBuilder.messageConverters(mappingJackson2HttpMessageConverter).build();
     afterPropertiesSet();
   }
 
