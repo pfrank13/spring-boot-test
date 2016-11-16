@@ -21,12 +21,7 @@
     <!-- Start Compile Dependencies -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>spring-boot-client</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>spring-boot-persistence</artifactId>
+      <artifactId>spring-boot-service</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -58,7 +58,7 @@ public class RestOperationsPriceClientTest {
     WireMock.stubFor(mappingBuilder);
 
     //WHEN
-    final PriceResponse retVal = priceClient.findPriceByItemId("1");
+    final PriceResponse retVal = priceClient.findPriceByItemId(1);
 
     //THEN
     Assertions.assertThat(retVal.getItemId()).isEqualTo("1");
