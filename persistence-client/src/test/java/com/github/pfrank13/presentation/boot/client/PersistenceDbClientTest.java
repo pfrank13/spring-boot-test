@@ -35,16 +35,10 @@ public class PersistenceDbClientTest {
   @Test
   public void loadCategoryById() {
     //GIVEN
-    final Category parentCategory = new Category();
-    parentCategory.setName("parentCategory");
-    AbstractEntity.setDates(parentCategory);
-
     final Category category = new Category();
     category.setName("category");
-    category.setParent(parentCategory);
     AbstractEntity.setDates(category);
 
-    entityManager.persist(parentCategory);
     entityManager.persist(category);
 
     //WHEN

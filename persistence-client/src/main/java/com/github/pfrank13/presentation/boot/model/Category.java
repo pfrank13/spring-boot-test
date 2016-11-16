@@ -19,10 +19,6 @@ public class Category extends AbstractEntity<Integer>{
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @ManyToOne
-  @JoinColumn(name = "parentId")
-  private Category parent;
-
   @Column
   private String name;
 
@@ -44,14 +40,6 @@ public class Category extends AbstractEntity<Integer>{
 
   public void setName(final String name) {
     this.name = name;
-  }
-
-  public Category getParent() {
-    return parent;
-  }
-
-  public void setParent(Category parent) {
-    this.parent = parent;
   }
 
   public List<Item> getItems() {
