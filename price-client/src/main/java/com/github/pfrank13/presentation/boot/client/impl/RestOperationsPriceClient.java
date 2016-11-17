@@ -12,6 +12,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.zalando.jackson.datatype.money.MoneyModule;
 
@@ -20,7 +21,7 @@ import org.zalando.jackson.datatype.money.MoneyModule;
  */
 @Service
 public class RestOperationsPriceClient implements PriceClient{
-  private final RestOperations restOperations;
+  private final RestTemplate restOperations;
 
   @Autowired
   public RestOperationsPriceClient(
@@ -43,5 +44,9 @@ public class RestOperationsPriceClient implements PriceClient{
   public PriceResponse findPriceByItemId(final int itemId) {
     final String uriString = UriComponentsBuilder.newInstance().pathSegment("item", Integer.toString(itemId), "price").build().toUriString();
     return restOperations.getForObject(uriString, PriceResponse.class);
+  }
+
+  public RestTemplate getRestOperations() {
+    return restOperations;
   }
 }

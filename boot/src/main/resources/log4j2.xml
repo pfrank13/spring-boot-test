@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="debug">
+  <Properties>
+    <Property name="log-path">logs</Property>
+  </Properties>
+
+  <Appenders>
+    <!--
+    <RollingFile name="file-log" fileName="${log-path}/mycuteblog-info.log"
+                 filePattern="${log-path}/mycuteblog-info-%d{yyyy-MM-dd}.log">
+      <PatternLayout>
+        <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</pattern>
+      </PatternLayout>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+      </Policies>
+    </RollingFile>
+    -->
+    <Console name="console" target="SYSTEM_OUT">
+      <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="com.github.pfrank13" level="debug" additivity="false">
+      <appender-ref ref="console" level="debug"/>
+    </Logger>
+    <Logger name="org.springframework" level="info" additivity="false">
+      <appender-ref ref="console" level="info"/>
+    </Logger>
+    <Logger name="org.hibernate" level="info" additivity="false">
+      <appender-ref ref="console" level="info"/>
+    </Logger>
+    <Logger name="org.apache.http" level="debug" additivity="false">
+      <appender-ref ref="console" level="debug"/>
+    </Logger>
+    <Root level="info" additivity="false">
+      <appender-ref ref="console" level="info"/>
+    </Root>
+  </Loggers>
+</Configuration>

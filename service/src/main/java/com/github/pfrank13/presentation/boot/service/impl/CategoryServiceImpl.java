@@ -9,6 +9,8 @@ import com.github.pfrank13.presentation.boot.model.Category;
 import com.github.pfrank13.presentation.boot.model.Item;
 import com.github.pfrank13.presentation.boot.service.CategoryService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
  * @author pfrank
  */
 public class CategoryServiceImpl implements CategoryService{
+  private static final Logger LOG = LoggerFactory.getLogger(CategoryServiceImpl.class);
   private final PersistenceDbClient persistenceDbClient;
   private final PriceClient priceClient;
 
@@ -42,9 +45,11 @@ public class CategoryServiceImpl implements CategoryService{
     final Optional<Category> categoryOptional = persistenceDbClient.loadCategoryById(categoryId);
     final Optional<CategoryDto> retVal;
     if(categoryOptional.isPresent()){
+      LOG.debug("Category with id={} was found", categoryId);
       final Category category = categoryOptional.get();
       retVal = Optional.of(transformCategory(category));
     }else{
+      LOG.debug("Category with id={} was NOT found returning empty", categoryId);
       retVal = Optional.empty();
     }
 
@@ -52,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService{
   }
 
   CategoryDto transformCategory(final Category category){
-    final CategoryDto categoryDto = new CategoryDto();
+    final CategoryDto categoryDto = transformToCategoryDto(category);
     final List<ItemDto> itemDtos;
     if(!CollectionUtils.isEmpty(category.getItems())) {
       itemDtos = category.getItems().stream().map(this::transformItem).collect(Collectors.toList());
@@ -76,6 +81,14 @@ public class CategoryServiceImpl implements CategoryService{
     itemDto.setId(item.getId());
 
     return itemDto;
+  }
+
+  CategoryDto transformToCategoryDto(final Category category){
+    final CategoryDto categoryDto = new CategoryDto();
+    categoryDto.setId(category.getId());
+    categoryDto.setName(category.getName());
+
+    return categoryDto;
   }
 
   void mapPrice(final PriceResponse priceResponse, final ItemDto itemDto){

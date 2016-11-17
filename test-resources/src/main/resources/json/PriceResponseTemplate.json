@@ -1,0 +1,7 @@
+{
+  "itemId": %d,
+  "price": {
+    "amount": %s,
+    "currency": "USD"
+  }
+}

@@ -1,4 +1,4 @@
-package com.github.pfrank13.presentation.boot.service.conf;
+package com.github.pfrank13.presentation.boot.conf;
 
 import com.github.pfrank13.presentation.boot.client.PersistenceDbClient;
 import com.github.pfrank13.presentation.boot.client.PriceClient;

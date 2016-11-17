@@ -11,7 +11,7 @@ import javax.transaction.Transactional;
 /**
  * @author pfrank
  */
-@Transactional
+@Transactional()
 public interface PersistenceDbClient {
   Category persistCategory(final Category category);
   Optional<Category> loadCategoryById(final int id);

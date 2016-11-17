@@ -1,9 +1,13 @@
 package com.github.pfrank13.presentation.boot.model;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 /**
  * @author pfrank
@@ -15,12 +19,16 @@ public class Item extends AbstractEntity<Integer>{
 
   private String name;
 
+  @ManyToOne
+  @JoinColumn(name = "categoryId")
+  private Category category;
+
   @Override
   public Integer getId() {
     return id;
   }
 
-  public void setId(Integer id) {
+  public void setId(final Integer id) {
     this.id = id;
   }
 
@@ -28,7 +36,15 @@ public class Item extends AbstractEntity<Integer>{
     return name;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
+  }
+
+  public Category getCategory() {
+    return category;
+  }
+
+  public void setCategory(final Category category) {
+    this.category = category;
   }
 }

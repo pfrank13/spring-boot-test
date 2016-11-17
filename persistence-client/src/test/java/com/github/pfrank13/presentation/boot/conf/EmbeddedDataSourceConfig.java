@@ -15,7 +15,7 @@ public class EmbeddedDataSourceConfig {
   @Bean
   public DataSource persistenceDbDataSource(){
     return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-                                        .addScript("classpath:/sql/schema-h2.sql")
+                                        .addScript("classpath:/schema.sql")
                                         .setName("persistenceDb")
                                         .build();
   }

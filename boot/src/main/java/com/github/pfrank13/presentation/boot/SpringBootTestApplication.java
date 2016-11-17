@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.github.pfrank13.presentation.boot.conf"})
+@ComponentScan(basePackages = {"com.github.pfrank13.presentation.boot.conf", "com.github.pfrank13.presentation.boot.web"})
 public class SpringBootTestApplication {
 
   public static void main(String[] args) {
