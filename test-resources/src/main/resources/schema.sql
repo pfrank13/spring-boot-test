@@ -17,3 +17,6 @@ CREATE TABLE item(
   optimisticLockVersion INT NOT NULL,
   FOREIGN KEY(categoryId) REFERENCES category(id)
 );
+
+INSERT INTO category(name, lastModifiedDateTime, createdDateTime, optimisticLockVersion)
+    VALUES('someCategory', NOW(), NOW(), 0);

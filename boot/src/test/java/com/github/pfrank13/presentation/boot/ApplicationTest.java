@@ -4,6 +4,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
 import com.github.pfrank13.presentation.boot.annotation.MyCustomCompsiteAnnotation;
+import com.github.pfrank13.presentation.boot.client.PersistenceBootstrapClient;
 import com.github.pfrank13.presentation.boot.client.PersistenceDbClient;
 import com.github.pfrank13.presentation.boot.client.impl.RestOperationsPriceClient;
 import com.github.pfrank13.presentation.boot.dto.CategoryDto;
@@ -58,14 +59,10 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @AutoConfigureTestDatabase
 @AutoConfigureTestEntityManager
 @AutoConfigureWebClient
-@Transactional
 //@MyCustomCompsiteAnnotation
 public class ApplicationTest {
   @Autowired
   private TestRestTemplate testRestTemplate;
-
-  @PersistenceContext(name = "persistenceDb")
-  private EntityManager entityManager;
 
   @Autowired
   private CategoryService categoryService;
@@ -75,6 +72,9 @@ public class ApplicationTest {
 
   @Autowired
   private MockRestServiceServer mockRestServiceServer;
+
+  @Autowired
+  private PersistenceBootstrapClient persistenceBootstrapClient;
 
   @Test
   public void loadCategoryById() throws IOException{
@@ -96,7 +96,7 @@ public class ApplicationTest {
     //categoryService.loadCategoryById(1).get();
 
     //WHEN
-    final CategoryDto categoryDto = testRestTemplate.getForObject("/category/1", CategoryDto.class);
+    final CategoryDto categoryDto = testRestTemplate.getForObject("/category/2", CategoryDto.class);
 
     //THEN
     Assertions.assertThat(categoryDto).isEqualToComparingOnlyGivenFields(category, "id", "name");
@@ -117,11 +117,10 @@ public class ApplicationTest {
     final ImmutableList.Builder<Item> itemsBuilder = ImmutableList.builder();
     for(int counter = 0; counter < itemCount; counter++){
       item = createItemForCategory(category);
-      entityManager.persist(item);
       itemsBuilder.add(item);
     }
 
-    return itemsBuilder.build();
+    return persistenceBootstrapClient.persistItemsForCategory(itemsBuilder.build());
   }
 
   Category persistCategory(){
@@ -129,9 +128,7 @@ public class ApplicationTest {
     category.setName("category");
     AbstractEntity.setDates(category);
 
-    entityManager.persist(category);
-
-    return category;
+    return persistenceBootstrapClient.persistCategory(category);
   }
 
   Item createItemForCategory(final Category category){
