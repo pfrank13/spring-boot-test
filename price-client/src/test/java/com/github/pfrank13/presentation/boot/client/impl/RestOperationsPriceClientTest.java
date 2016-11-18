@@ -5,6 +5,7 @@ import com.google.common.net.HttpHeaders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.pfrank13.presentation.boot.client.PriceClient;
 import com.github.pfrank13.presentation.boot.client.dto.PriceResponse;
+import com.github.pfrank13.presentation.boot.conf.PriceClientConfig;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -41,8 +42,8 @@ public class RestOperationsPriceClientTest {
 
   @Before
   public void setUp() {
-    priceClient =  new RestOperationsPriceClient("http://localhost:" + instanceRule.port(), new RestTemplateBuilder());
-
+    final PriceClientConfig priceClientConfig = new PriceClientConfig("http://localhost:" + instanceRule.port());
+    priceClient = priceClientConfig.priceClient();
   }
 
   @Test

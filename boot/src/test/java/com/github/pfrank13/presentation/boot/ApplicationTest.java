@@ -19,6 +19,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
@@ -61,6 +63,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @AutoConfigureWebClient
 //@MyCustomCompsiteAnnotation
 public class ApplicationTest {
+  private static final Logger LOG = LoggerFactory.getLogger(ApplicationTest.class);
   @Autowired
   private TestRestTemplate testRestTemplate;
 
@@ -76,9 +79,13 @@ public class ApplicationTest {
   @Autowired
   private PersistenceBootstrapClient persistenceBootstrapClient;
 
+  @Autowired
+  private RestOperationsPriceClient restOperationsPriceClient;
+
   @Test
   public void loadCategoryById() throws IOException{
     //GIVEN
+    LOG.info("MockRestServiceServer in test={}", mockRestServiceServer);
     final Category category = persistCategory();
     final List<Item> persistedItems = persistItems(category);
 
