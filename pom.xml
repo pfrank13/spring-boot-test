@@ -57,4 +57,28 @@
       <!-- END Test Dependencies -->
     </dependencies>
   </dependencyManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.github.jeluard</groupId>
+        <artifactId>plantuml-maven-plugin</artifactId>
+        <version>1.2-SNAPSHOT</version>
+        <configuration>
+          <sourceFiles>
+            <directory>${basedir}</directory>
+            <includes>
+              <include>src/main/plantuml/**/*.puml</include>
+            </includes>
+          </sourceFiles>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>net.sourceforge.plantuml</groupId>
+            <artifactId>plantuml</artifactId>
+            <version>8031</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
 </project>

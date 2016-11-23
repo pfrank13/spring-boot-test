@@ -1,0 +1,31 @@
+@startuml
+
+actor developer as d
+participant JunitRule as j
+participant JunitTest as jt
+participant RestAssured as ra
+participant SpringBoot as sb
+participant WireMock as wm
+participant EmbeddedDb as edb
+
+d -> j: mvn clean install
+j -> wm: start server and get remote port
+j <- wm: remote port
+j -> sb: start spring boot against remote port \n and get spring boot port
+sb -> j: SpringBoot port
+j -> ra: Configure RestAssured\n for SpringBoot port
+jt -> wm: mock get /remoteBar
+wm -> jt: success?
+jt -> ra: test for get /foo
+ra -> sb: get /foo
+sb -> wm: get /remoteBar
+wm -> sb: mock response
+sb -> edb: get ResultSet
+edb -> sb: ResultSet response
+sb -> ra: mapped response
+ra -> jt: ValidatableResponse
+jt -> ra: Validate (Status, Path etc)
+ra -> jt: isValid
+jt -> j: Cleanup
+j -> d: pass/fail build
+@enduml
