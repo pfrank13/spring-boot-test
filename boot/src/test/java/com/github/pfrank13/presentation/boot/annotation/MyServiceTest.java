@@ -24,12 +24,11 @@ import java.lang.annotation.Target;
 @Documented
 @Inherited
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebClient
 @AutoConfigureCache
 @AutoConfigureDataJpa
 @AutoConfigureTestDatabase
 @AutoConfigureTestEntityManager
-@Transactional
-public @interface MyCustomCompsiteAnnotation {
+@AutoConfigureWebClient
+public @interface MyServiceTest {
 
 }

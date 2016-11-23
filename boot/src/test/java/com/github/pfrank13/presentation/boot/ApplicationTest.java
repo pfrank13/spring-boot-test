@@ -3,50 +3,32 @@ package com.github.pfrank13.presentation.boot;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
-import com.github.pfrank13.presentation.boot.annotation.MyCustomCompsiteAnnotation;
+import com.github.pfrank13.presentation.boot.annotation.MyServiceTest;
 import com.github.pfrank13.presentation.boot.client.PersistenceBootstrapClient;
-import com.github.pfrank13.presentation.boot.client.PersistenceDbClient;
-import com.github.pfrank13.presentation.boot.client.impl.RestOperationsPriceClient;
 import com.github.pfrank13.presentation.boot.dto.CategoryDto;
 import com.github.pfrank13.presentation.boot.dto.ItemDto;
 import com.github.pfrank13.presentation.boot.model.AbstractEntity;
 import com.github.pfrank13.presentation.boot.model.Category;
 import com.github.pfrank13.presentation.boot.model.Item;
-import com.github.pfrank13.presentation.boot.repository.CategoryRepository;
-import com.github.pfrank13.presentation.boot.service.CategoryService;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.core.AutoConfigureCache;
-import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
-import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transaction;
 
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -56,31 +38,24 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+/*
 @AutoConfigureCache
 @AutoConfigureDataJpa
 @AutoConfigureTestDatabase
 @AutoConfigureTestEntityManager
 @AutoConfigureWebClient
-//@MyCustomCompsiteAnnotation
+*/
+@MyServiceTest
 public class ApplicationTest {
   private static final Logger LOG = LoggerFactory.getLogger(ApplicationTest.class);
   @Autowired
   private TestRestTemplate testRestTemplate;
 
   @Autowired
-  private CategoryService categoryService;
-
-  @Autowired
-  private CategoryRepository categoryRepository;
-
-  @Autowired
   private MockRestServiceServer mockRestServiceServer;
 
   @Autowired
   private PersistenceBootstrapClient persistenceBootstrapClient;
-
-  @Autowired
-  private RestOperationsPriceClient restOperationsPriceClient;
 
   @Test
   public void loadCategoryById() throws IOException{

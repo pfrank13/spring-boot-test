@@ -3,7 +3,6 @@ package com.github.pfrank13.presentation.boot.client;
 import com.github.pfrank13.presentation.boot.model.Category;
 import com.github.pfrank13.presentation.boot.model.Item;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.transaction.annotation.Transactional;
 
