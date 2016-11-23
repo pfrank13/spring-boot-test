@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
@@ -37,14 +36,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * @author pfrank
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-/*
-@AutoConfigureCache
-@AutoConfigureDataJpa
-@AutoConfigureTestDatabase
-@AutoConfigureTestEntityManager
-@AutoConfigureWebClient
-*/
 @MyServiceTest
 public class ApplicationTest {
   private static final Logger LOG = LoggerFactory.getLogger(ApplicationTest.class);
@@ -73,9 +64,6 @@ public class ApplicationTest {
       this.mockRestServiceServer.expect(requestTo("/item/" + persistedItem.getId().toString() + "/price"))
                                 .andRespond(withSuccess(priceResponse, MediaType.APPLICATION_JSON));
     }
-
-    //categoryRepository.findOne(1);
-    //categoryService.loadCategoryById(1).get();
 
     //WHEN
     final CategoryDto categoryDto = testRestTemplate.getForObject("/category/2", CategoryDto.class);
