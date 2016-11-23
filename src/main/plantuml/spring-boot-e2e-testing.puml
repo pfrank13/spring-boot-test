@@ -1,0 +1,33 @@
+@startuml
+
+actor developer as d
+participant "@MyServiceTest" as mst
+participant JunitTest as jt
+participant TestRestTemplate as trt
+participant SpringBootApp as sb
+participant MockRestServiceServer as mrss
+participant EmbeddedDb as edb
+
+d -> mst: mvn clean install
+mst -> mst: start \nSpring Boot Test Context
+mst -> sb: start app
+mst -> edb: bootstrap with sql
+edb -> mst: success?
+sb -> trt: configure TestRestTemplate\n for port
+mst -> mrss: create
+mrss -> sb: configure RestTemplate
+jt -> mrss: mock get /remoteBar
+jt -> trt: test for get /foo
+trt -> sb: get /foo
+sb -> mrss: get /remoteBar
+mrss -> sb: mock response
+sb -> edb: get ResultSet
+edb -> sb: ResultSet response
+sb -> trt: mapped response
+trt -> jt: ResponseEntity or Object
+jt -> jt: isValid
+jt -> mst: pass/fail test
+mst -> mst: shutdown \nSpring Boot Test Context
+mst -> d: pass/fail build
+
+@enduml

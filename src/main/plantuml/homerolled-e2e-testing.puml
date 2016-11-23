@@ -4,7 +4,7 @@ actor developer as d
 participant JunitRule as j
 participant JunitTest as jt
 participant RestAssured as ra
-participant SpringBoot as sb
+participant SpringBootApp as sb
 participant WireMock as wm
 participant EmbeddedDb as edb
 
@@ -12,6 +12,9 @@ d -> j: mvn clean install
 j -> wm: start server and get remote port
 j <- wm: remote port
 j -> sb: start spring boot against remote port \n and get spring boot port
+sb -> sb: Configure RemoteClient\nfor remote port
+sb -> edb: bootstrap with sql
+edb -> sb: success?
 sb -> j: SpringBoot port
 j -> ra: Configure RestAssured\n for SpringBoot port
 jt -> wm: mock get /remoteBar
