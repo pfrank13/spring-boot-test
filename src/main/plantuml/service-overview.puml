@@ -1,0 +1,10 @@
+@startuml
+participant Client as c
+participant SpringBootApp as sba
+participant PriceService as ps
+database persistenceDB as pdb
+c -> sba: via http
+note left: Apologies on the diagram I'm not\n a master at  PlantUML
+sba -> ps: via http
+sba -> pdb: via jdbc
+@enduml
