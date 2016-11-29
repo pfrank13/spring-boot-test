@@ -287,3 +287,40 @@ public class RestOperationsPriceClientTest {
 ```
 
 #### @JsonTest
+This annotation is the aggregate of {@AutoConfigureCache, @AutoConfigureJson, @AutoConfigureJsonTesters}
+
+1. **AutoConfigureJson**: will be used to configure an ObjectMapper, if you create Jackson2ObjectMapperBuilderCustomizers you can manipulate the ObjectMapper configuration, but remember for common configurations there is usually a property that can be twiddled in order to do that, so for ObjectMapper it’s spring.jackson.* related properties.
+2. **AutoConfigureJsonTesters**: Will expose JacksonTester<T> for testing the domain objects.
+
+This is from [Spring Boot Test Samples](https://github.com/spring-projects/spring-boot/blob/master/spring-boot-samples/spring-boot-sample-test/src/test/java/sample/test/service/VehicleDetailsJsonTests.java)
+
+```java
+@RunWith(SpringRunner.class)
+@JsonTest
+public class VehicleDetailsJsonTests {
+
+	@Autowired
+	private JacksonTester<VehicleDetails> json;
+
+	@Test
+	public void serializeJson() throws Exception {
+		VehicleDetails details = new VehicleDetails("Honda", "Civic");
+		assertThat(this.json.write(details)).isEqualTo("vehicledetails.json");
+		assertThat(this.json.write(details)).isEqualToJson("vehicledetails.json");
+		assertThat(this.json.write(details)).hasJsonPathStringValue("@.make");
+		assertThat(this.json.write(details)).extractingJsonPathStringValue("@.make")
+				.isEqualTo("Honda");
+	}
+
+	@Test
+	public void deserializeJson() throws Exception {
+		String content = "{\"make\":\"Ford\",\"model\":\"Focus\"}";
+		assertThat(this.json.parse(content))
+				.isEqualTo(new VehicleDetails("Ford", "Focus"));
+		assertThat(this.json.parseObject(content).getMake()).isEqualTo("Ford");
+	}
+}
+```
+
+I don't have a counter example to this from my example project as I simply test this as a side effect of other types of testing.  However, the JacksonTester provides tools that will be important to those assertions, more on that later.
+
