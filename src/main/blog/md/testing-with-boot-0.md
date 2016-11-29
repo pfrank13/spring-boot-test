@@ -163,4 +163,127 @@ public class PersistenceDbClientTest {
 ```
 
 #### @RestClientTest
+The aggregate of: {@AutoConfigureCache @AutoConfigureWebClient @AutoConfigureMockRestServiceServer}
+
+1. **AutoConfigureWebClient**: Exposes a RestTemplateBuilder into the context or a RestTemplate depending on configuration, not useful if you are using multiple RestTempates
+2. **AutoConfigureMockRestServiceServer**: Exposes a MockRestServiceServer that has a DSL that is similar to WireMock to actually create response objects for your client to consume.  Interestingly enough this doesn’t use WireMock it’s just injecting a MockClientHttpRequestFactory into the RestTemplate it configures for you, so your tests actually don’t use the network.  This also doesn’t work with multiple backends you would need to be explicit and use a MockServerRestTemplateCustomizer
+
+This is from [Spring Boot Test Samples](https://github.com/spring-projects/spring-boot/blob/master/spring-boot-samples/spring-boot-sample-test/src/test/java/sample/test/service/RemoteVehicleDetailsServiceTests.java)
+```java
+@RunWith(SpringRunner.class)
+@RestClientTest({ RemoteVehicleDetailsService.class, ServiceProperties.class })
+public class RemoteVehicleDetailsServiceTests {
+
+	private static final String VIN = "00000000000000000";
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
+	@Autowired
+	private RemoteVehicleDetailsService service;
+
+	@Autowired
+	private MockRestServiceServer server;
+
+	@Test
+	public void getVehicleDetailsWhenResultIsSuccessShouldReturnDetails()
+			throws Exception {
+		this.server.expect(requestTo("/vehicle/" + VIN + "/details"))
+				.andRespond(withSuccess(getClassPathResource("vehicledetails.json"),
+						MediaType.APPLICATION_JSON));
+		VehicleDetails details = this.service
+				.getVehicleDetails(new VehicleIdentificationNumber(VIN));
+		assertThat(details.getMake()).isEqualTo("Honda");
+		assertThat(details.getModel()).isEqualTo("Civic");
+	}
+
+	@Test
+	public void getVehicleDetailsWhenResultIsNotFoundShouldThrowException()
+			throws Exception {
+		this.server.expect(requestTo("/vehicle/" + VIN + "/details"))
+				.andRespond(withStatus(HttpStatus.NOT_FOUND));
+		this.thrown.expect(VehicleIdentificationNumberNotFoundException.class);
+		this.service.getVehicleDetails(new VehicleIdentificationNumber(VIN));
+	}
+
+	@Test
+	public void getVehicleDetailsWhenResultIServerErrorShouldThrowException()
+			throws Exception {
+		this.server.expect(requestTo("/vehicle/" + VIN + "/details"))
+				.andRespond(withServerError());
+		this.thrown.expect(HttpServerErrorException.class);
+		this.service.getVehicleDetails(new VehicleIdentificationNumber(VIN));
+	}
+
+	private ClassPathResource getClassPathResource(String path) {
+		return new ClassPathResource(path, getClass());
+	}
+
+}
+```
+
+In my multimodule project I have this test that doesn't even rely on Spring but exercises a test for the Spring Java Config that Spring would use at runtime.
+```java
+public class RestOperationsPriceClientTest {
+  @ClassRule
+  public static WireMockClassRule wireMockRule = new WireMockClassRule(0);
+
+  @Rule
+  public WireMockClassRule instanceRule = wireMockRule;
+
+  private PriceClient priceClient;
+
+  @Before
+  public void setUp() {
+    final PriceClientConfig priceClientConfig = new PriceClientConfig("http://localhost:" + instanceRule.port()); //Spring Java Config
+    priceClient = priceClientConfig.priceClient();
+  }
+
+  @Test
+  public void findPriceByItemId() throws IOException{
+    //GIVEN
+    final MappingBuilder mappingBuilder = WireMock.get(WireMock.urlEqualTo("/item/1/price"));
+
+    final ResponseDefinitionBuilder responseDefinitionBuilder = WireMock.aResponse().withStatus(200);
+    responseDefinitionBuilder.withBody(StreamUtils.copyToByteArray(new ClassPathResource("/json/PriceResponse.json").getInputStream()));
+    responseDefinitionBuilder.withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+    mappingBuilder.willReturn(responseDefinitionBuilder);
+
+    WireMock.stubFor(mappingBuilder);
+
+    //WHEN
+    final PriceResponse retVal = priceClient.findPriceByItemId(1);
+
+    //THEN
+    Assertions.assertThat(retVal.getItemId()).isEqualTo("1");
+    final MonetaryAmount monetaryAmount = retVal.getPrice();
+    Assertions.assertThat(monetaryAmount).isNotNull();
+    Assertions.assertThat(monetaryAmount.getCurrency().getCurrencyCode()).isEqualTo("USD");
+    final BigDecimal bigDecimal = new BigDecimal("12.34");
+    Assertions.assertThat(monetaryAmount.getNumber().numberValue(BigDecimal.class)).isEqualTo(bigDecimal);
+
+  }
+
+  @Test
+  public void deserializeWithMoney() throws IOException{
+    //GIVEN
+    final ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new MoneyModule());
+    final String priceResponseString = new String(StreamUtils.copyToByteArray(new ClassPathResource("/json/PriceResponse.json").getInputStream()),
+        StandardCharsets.UTF_8);
+
+    //WHEN
+    final PriceResponse priceResponse = objectMapper.readValue(priceResponseString, PriceResponse.class);
+
+    //THEN
+    Assertions.assertThat(priceResponse.getItemId()).isEqualTo("1");
+    final MonetaryAmount monetaryAmount = priceResponse.getPrice();
+    Assertions.assertThat(monetaryAmount).isNotNull();
+    Assertions.assertThat(monetaryAmount.getCurrency().getCurrencyCode()).isEqualTo("USD");
+    final BigDecimal bigDecimal = new BigDecimal("12.34");
+    Assertions.assertThat(monetaryAmount.getNumber().numberValue(BigDecimal.class)).isEqualTo(bigDecimal);
+  }
+}
+```
+
 #### @JsonTest
