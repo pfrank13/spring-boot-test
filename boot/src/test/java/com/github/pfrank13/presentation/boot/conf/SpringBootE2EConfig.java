@@ -15,12 +15,12 @@ import org.springframework.web.client.RestTemplate;
  * @author pfrank
  */
 @Configuration
-public class AppConfig {
+public class SpringBootE2EConfig {
   private final RestTemplate priceClientRestTemplate;
   private final TestEntityManager testEntityManager;
 
   @Autowired
-  public AppConfig(final TestEntityManager testEntityManager, @Qualifier("priceClientRestTemplate") final RestTemplate priceClientRestTemplate){
+  public SpringBootE2EConfig(final TestEntityManager testEntityManager, @Qualifier("priceClientRestTemplate") final RestTemplate priceClientRestTemplate){
     this.priceClientRestTemplate = priceClientRestTemplate;
     this.testEntityManager = testEntityManager;
   }

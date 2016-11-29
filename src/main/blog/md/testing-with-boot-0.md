@@ -334,7 +334,133 @@ I don't have a counter example to this from my example project as I simply test 
 ![Example Service Architecture](../images/service-overview.png)
 
 #### My Old Homerolled End to End Testing Solution
-This is one way to test a Spring Boot Application end to end against mocks and effectively treating it like a black box.  You could replace JunitTest with BDD Cucumber JunitTest or the like.
+This is one way to test a Spring Boot Application end to end against mocks and effectively treating the Spring Boot App like a black box.  You could replace JunitTest with BDD Cucumber JunitTest or the like.
 
 ![Homrolled End to End Testing Solution](../images/homerolled-e2e-testing.png)
+
+#### Spring Boot End to End Testing Solution
+@MyServiceTest is a custom composite annotation that will aggregate all the @AutoConfigure annotations that we are using from the previous examples.
+![Spring Boot End to End Testing Solution](../images/spring-boot-e2e-testing.png)
+
+#### Example Service Project Layout
+- **spring-boot-test**: parent multimodule pom
+    - **test-resources**: typically I have a jar that I include in other modules that contain JSON Templates, common beans that are given to me by Spring Boot but I need for a module, PropertyPlaceholderConfigurer is an example and in the home rolled days my EmbeddedDBConfig file which is obviated by the Spring Boot Test annotations.
+    - **persistence-client**: Spring Data Jpa tier that has a production MySQLDataSourceConfig and an EmbeddedDataSourceConfig in it
+    - **price-client**: Contains the RestTemplate backed client.
+    - **service**: Orchestration that uses the clients, in real projects this is typically my business tier.
+    - **boot**: Spring Boot specific code and also web tier, in an ideal world these objects just one line delegate to my service tier.
+
+#### @MyServiceTest
+This a custom annotation that is the aggregate of {@SpringBootTest,@AutoConfigureCache,@AutoConfigureDataJpa,@AutoConfigureTestDatabase,@AutoConfigureTestEntityManager,@AutoConfigureWebClient}
+
+All the facilities that we’ve walked through will be available in my test and I’ll be using a TestRestTemplate that will be used to actually make calls to our service.  The @SpringBootTest allows us to fire up our application listening to a port and it will configure our TestRestTemplate for us.  There is a big gotcha here, if you remember during the @RestClientTest explaination I mentioned how, so long as you have 1 RestTemplate you can use those annotations without worrying about it.  Well the TestRestTemplate of course wraps a RestTemplate and that’s when I learned all about customizers and the like.  Spring is always great and it was clear what the problem was, going about getting around it was the trick.
+
+The entire Example Service can be found [here](https://github.com/pfrank13/spring-boot-test)
+```java
+@Configuration
+public class SpringBootE2EConfig {
+  private final RestTemplate priceClientRestTemplate;
+  private final TestEntityManager testEntityManager;
+
+  @Autowired
+  public SpringBootE2EConfig(final TestEntityManager testEntityManager, @Qualifier("priceClientRestTemplate") final RestTemplate priceClientRestTemplate){
+    this.priceClientRestTemplate = priceClientRestTemplate;
+    this.testEntityManager = testEntityManager;
+  }
+
+  //2
+  @Bean
+  public MockRestServiceServer mockRestServiceServer(){
+    final MockServerRestTemplateCustomizer mockServerRestTemplateCustomizer = new MockServerRestTemplateCustomizer();
+    mockServerRestTemplateCustomizer.customize(priceClientRestTemplate);
+    final MockRestServiceServer mockRestServiceServer = mockServerRestTemplateCustomizer.getServer(priceClientRestTemplate);
+    return mockRestServiceServer;
+  }
+
+  @Bean
+  public PersistenceBootstrapClient persistenceBootstrapClient(){
+    return new PersistenceBootstrapClient(testEntityManager);
+  }
+}
+
+
+@RunWith(SpringRunner.class)
+@MyServiceTest
+public class ApplicationTest {
+  @Autowired
+  private TestRestTemplate testRestTemplate; //1
+
+  @Autowired
+  private MockRestServiceServer mockRestServiceServer; //2
+
+  @Autowired
+  private PersistenceBootstrapClient persistenceBootstrapClient; //3
+
+  @Test
+  public void loadCategoryById() throws IOException{
+    //GIVEN
+    final Category category = persistCategory();
+    final List<Item> persistedItems = persistItems(category);
+
+    final String priceResponseTemplate = StreamUtils.copyToString(new ClassPathResource("/json/PriceResponseTemplate.json").getInputStream(),
+        StandardCharsets.UTF_8);
+    int counter = 1;
+    String priceResponse;
+    for(Item persistedItem : persistedItems) {
+      priceResponse = String.format(priceResponseTemplate, category.getId(), counter + ".23");
+      this.mockRestServiceServer.expect(requestTo("/item/" + persistedItem.getId().toString() + "/price"))
+                                .andRespond(withSuccess(priceResponse, MediaType.APPLICATION_JSON));
+    }
+
+    //WHEN
+    final CategoryDto categoryDto = testRestTemplate.getForObject("/category/2", CategoryDto.class);
+
+    //THEN
+    Assertions.assertThat(categoryDto).isEqualToComparingOnlyGivenFields(category, "id", "name");
+    final List<ItemDto> itemDtos = categoryDto.getItems();
+    Assertions.assertThat(itemDtos).hasSize(persistedItems.size());
+    final Map<Integer, ItemDto> itemDtoMap = FluentIterable.from(itemDtos).uniqueIndex(ItemDto::getId);
+    ItemDto itemDto;
+    for(Item persistedItem : persistedItems){
+      itemDto = itemDtoMap.get(persistedItem.getId());
+      Assertions.assertThat(persistedItem).isEqualToComparingOnlyGivenFields(itemDto, "id", "name");
+      Assertions.assertThat(itemDto.getPrice()).isNotNull();
+    }
+  }
+
+  List<Item> persistItems(final Category category){
+    int itemCount = 4;
+    Item item;
+    final ImmutableList.Builder<Item> itemsBuilder = ImmutableList.builder();
+    for(int counter = 0; counter < itemCount; counter++){
+      item = createItemForCategory(category);
+      itemsBuilder.add(item);
+    }
+
+    return persistenceBootstrapClient.persistItemsForCategory(itemsBuilder.build());
+  }
+
+  Category persistCategory(){
+    final Category category = new Category();
+    category.setName("category");
+    AbstractEntity.setDates(category);
+
+    return persistenceBootstrapClient.persistCategory(category);
+  }
+
+  Item createItemForCategory(final Category category){
+    final long currentTimeMillis = System.currentTimeMillis();
+    final Item item = new Item();
+    AbstractEntity.setDates(item);
+    item.setName("itemName" + currentTimeMillis);
+
+    item.setCategory(category);
+
+    return item;
+  }
+}
+```
+1. **TestRestTemplate**: This is our client for our test against our Spring Boot Application
+2. **MockRestServiceServer**: Notice that to configure our PriceClient's RestTemplate properly we needed to use a customizer because our test uses the same Spring Context as our application and thus has 2 RestTemplates available so the AutoConfigureMockRestServiceServer annotation couldn't be used
+3. **PersistenceBootstrapClient**: So this is sort of a smell (there is most likely a better way to do this), the reason being is you would need the test to be @Transactional in order to use the TestEntityManager directly, but because the test thread is the same as the Spring Boot Apps thread you have a transaction boundary issue.  So the PersistenceBootstrapClient provides a transactional boundary to make sure the transaction is closed before the actual application is run.
 
