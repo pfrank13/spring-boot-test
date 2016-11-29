@@ -4,4 +4,4 @@ This is a repository for using the current state of the art in testing Spring Bo
 mvn clean install //builds project and UML diagrams
 ````
 
-[MyLink](./link.md)
+[Blog](src/main/blog/md/testing-with-boot-0.md)
