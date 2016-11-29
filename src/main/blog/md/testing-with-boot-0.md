@@ -5,6 +5,7 @@ This article will walk through a quick overview of what Spring Boot is, the late
 
 1. [What is Spring Boot](#what-is-spring-boot)
 2. [New Spring Boot Test Annotations](#new-spring-boot-test-annotations)
+3. [Example Service Using These Facilities (sort of)](#my-example-service)
 
 ### What is Spring Boot
 1. **Opinionated**: Spring Boot is opinionated in that if you just want the defaults it’s great. Spring Boot will autoconfigure everything for you and you’re all set. If you want to pick and choose things it’s still possible but you may have to pierce the veil quite a bit to facilitate that. This is very similar to the XML style namespace config that Spring supports, the same thing happens there, if you can do defaults your great, otherwise you’ll need to understand the auto configuration a lot more, and usually the underlying implementation much more.
@@ -323,4 +324,17 @@ public class VehicleDetailsJsonTests {
 ```
 
 I don't have a counter example to this from my example project as I simply test this as a side effect of other types of testing.  However, the JacksonTester provides tools that will be important to those assertions, more on that later.
+
+### My Example Service
+**Disclaimer**: There is a limiting factor of how the Spring Boot Test annotations need to run and that’s in the context of a full Spring Boot Application.  The Spring Boot Application itself, @SpringBootApplication or the like, needs to be found for (I think) the @ImportAutoConfiguration to even begin to work correctly.  I usually don’t do single module projects and tools like JaCoCo, by default, aren’t great with testing a module outside of that module, although I believe it is possible I’m just ignorant of how at the moment.
+
+**Standardized Toolchain**: At Spring One I was very pleased that the community had the pieces of how I usually test Spring Boot Applications, at least from an end to end test with mock dependencies.  The Spring Boot Test annotations gave me a great place to start reverse engineering the tools at my disposal in order to replace my standard toolchain.
+
+#### Example Service Architecture
+![Example Service Architecture](../images/service-overview.png)
+
+#### My Old Homerolled End to End Testing Solution
+This is one way to test a Spring Boot Application end to end against mocks and effectively treating it like a black box.  You could replace JunitTest with BDD Cucumber JunitTest or the like.
+
+![Homrolled End to End Testing Solution](../images/homerolled-e2e-testing.png)
 
